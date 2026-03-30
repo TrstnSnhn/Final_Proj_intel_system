@@ -1,0 +1,16 @@
+experiment_name: baseline_scratch
+model:
+  architecture: simple_cnn
+  num_classes: 38
+  epochs: 15
+data:
+  batch_size: 32
+  num_workers: 2
+  augmentation: true
+training:
+  optimizer: adam
+  lr_unfrozen: 0.001
+  scheduler_patience: 3
+  scheduler_factor: 0.1
+  early_stopping_patience: 5
+  seed: 42

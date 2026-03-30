@@ -1,0 +1,10 @@
+experiment_name: baseline_sklearn
+model:
+  architecture: sklearn_rf
+  num_classes: 38
+data:
+  batch_size: 32
+  num_workers: 2
+  augmentation: false
+training:
+  seed: 42
