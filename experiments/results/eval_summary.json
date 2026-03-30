@@ -1,0 +1,6 @@
+{
+  "status": "placeholder_evaluation",
+  "all_models": true,
+  "selected_model": "resnet18",
+  "note": "Run after training checkpoints are available."
+}
