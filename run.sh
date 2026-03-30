@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== Step 0: Environment Check ==="
+echo "=== Step 0: Install/Verify Python Dependencies ==="
+python -m pip install -r requirements.txt
 python - <<'PY'
 import importlib
-import subprocess
 import sys
 
 required_modules = [
@@ -29,11 +29,13 @@ for name in required_modules:
         missing.append(name)
 
 if missing:
-    print(f"Missing Python packages detected: {', '.join(missing)}")
-    print("Installing dependencies from requirements.txt...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-else:
-    print("All required Python packages are available.")
+    raise SystemExit(
+        "Dependency verification failed. Missing modules: "
+        + ", ".join(missing)
+        + "\nEnsure the same Python interpreter is used for both pip and execution."
+    )
+
+print(f"Dependency verification passed using Python: {sys.executable}")
 PY
 
 echo "=== Step 1: Download Data ==="
