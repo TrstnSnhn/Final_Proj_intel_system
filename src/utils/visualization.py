@@ -1,39 +1,27 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
-
-import matplotlib.pyplot as plt
-import numpy as np
+import sys
 
 
-def save_placeholder(name: str, title: str):
-    out = Path("experiments/results")
-    out.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(6, 4))
-    plt.plot(np.random.rand(10))
-    plt.title(title)
-    plt.tight_layout()
-    plt.savefig(out / name, dpi=150)
-    plt.close()
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Visualization placeholder. Real plots should be generated from evaluation outputs."
+    )
+    parser.add_argument("--all", action="store_true", help="Reserved for future real plot generation.")
+    return parser
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--all", action="store_true")
-    args = parser.parse_args()
-
-    if args.all:
-        save_placeholder("learning_curves.png", "Learning Curves")
-        save_placeholder("confusion_matrix.png", "Confusion Matrix")
-        save_placeholder("per_class_f1.png", "Per-class F1")
-        save_placeholder("roc_curves.png", "ROC Curves")
-        save_placeholder("ablation_comparison.png", "Ablation Comparison")
-        save_placeholder("rl_thresholds.png", "RL Thresholds")
-        save_placeholder("class_distribution.png", "Class Distribution")
-        save_placeholder("misclassified_examples.png", "Misclassified Examples")
-        print("Generated placeholder plots in experiments/results")
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    parser.parse_args(argv)
+    print(
+        "Error: visualization generation is not implemented yet. "
+        "Run real evaluation first, then implement plots from saved metrics.",
+        file=sys.stderr,
+    )
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

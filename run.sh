@@ -22,13 +22,14 @@ python src/nlp_pipeline.py --action train
 echo "=== Step 7: Run RL Threshold Agent ==="
 python src/rl_agent.py --episodes 300
 
-echo "=== Step 8: Generate Placeholder Evaluation Summary ==="
-python src/eval.py --all
+echo "=== Step 8: Evaluation Requires a Trained Checkpoint ==="
+echo "After training, run for example:"
+echo "python src/eval.py --checkpoint experiments/checkpoints/resnet18_finetune_default_best.pt --data-dir data/splits/test --class-map experiments/checkpoints/resnet18_finetune_default_classes.json"
 
-echo "=== Step 9: Generate Placeholder Grad-CAM Figure ==="
-python src/gradcam.py --num-samples 12
+echo "=== Step 9: Grad-CAM Planned for Phase 2B ==="
+echo "src/gradcam.py is intentionally a non-generating placeholder until real checkpoint-based Grad-CAM is implemented."
 
-echo "=== Step 10: Generate Placeholder Plots ==="
-python src/utils/visualization.py --all
+echo "=== Step 10: Visualization Planned After Real Evaluation ==="
+echo "src/utils/visualization.py is intentionally a non-generating placeholder until metrics-backed plots are implemented."
 
 echo "=== Done! Results in experiments/results/ ==="

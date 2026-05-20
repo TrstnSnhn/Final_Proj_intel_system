@@ -11,9 +11,12 @@ What exists now:
 - PyTorch image-classification training scaffold.
 - Simple CNN and ResNet18 model definitions.
 - PlantVillage dataset download and split scripts.
+- Dataset validation CLI.
 - Experiment YAML configs.
+- Checkpoint and class mapping save/load support.
+- Real checkpoint-based evaluation CLI.
 - Basic NLP and RL project scaffolding.
-- Placeholder evaluation, visualization, and Grad-CAM scripts.
+- Grad-CAM and visualization placeholders that fail honestly until implemented.
 - A command-line inference entrypoint that works once a trained checkpoint and class mapping exist.
 
 What is not implemented yet:
@@ -23,7 +26,6 @@ What is not implemented yet:
 - No desktop app.
 - No deployment configuration.
 - No committed trained checkpoint.
-- No real evaluation metrics from a trained checkpoint.
 - No real Grad-CAM output tied to a trained checkpoint.
 
 ## Runtime Target
@@ -92,8 +94,10 @@ These commands do not download the dataset, train the full model, or deploy anyt
 python --version
 python -m py_compile src\*.py src\models\*.py src\utils\*.py data\get_data.py
 python -m unittest discover -s tests
+python src\validate_dataset.py --help
 python src\infer.py --help
 python src\train.py --help
+python src\eval.py --help
 ```
 
 If Ruff is installed:
@@ -114,6 +118,42 @@ python data\get_data.py
 
 Only run that command when you intentionally want to download the dataset.
 
+Expected raw dataset layout:
+
+```text
+data/raw/plantvillage/
+  Apple___healthy/
+    image-1.jpg
+  Tomato___Early_blight/
+    image-2.jpg
+```
+
+After splitting, training expects:
+
+```text
+data/splits/
+  train/
+    <class-name>/
+  val/
+    <class-name>/
+  test/
+    <class-name>/
+```
+
+Dataset folders are ignored by git. Keep `data/raw/`, `data/splits/`, and any large generated artifacts local.
+
+Validate the raw dataset folder without training:
+
+```powershell
+python src\validate_dataset.py data\raw\plantvillage --layout raw
+```
+
+Validate split folders:
+
+```powershell
+python src\validate_dataset.py data\splits --layout split
+```
+
 ## Training
 
 Training requires the dataset to exist under `data/raw/plantvillage/` and then be split into train/validation/test folders.
@@ -128,6 +168,21 @@ python src\train.py --config experiments\configs\resnet18_default.yaml
 Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are usually large and should not be committed by accident.
 
 The `baseline_sklearn.yaml` config is marked as not implemented. It documents a planned classical ML baseline, but `src/train.py` is a PyTorch trainer and does not run `sklearn_rf` yet.
+
+## Evaluation
+
+Evaluate a trained checkpoint against a class-folder split:
+
+```powershell
+python src\eval.py `
+  --checkpoint experiments\checkpoints\resnet18_finetune_default_best.pt `
+  --class-map experiments\checkpoints\resnet18_finetune_default_classes.json `
+  --data-dir data\splits\test `
+  --architecture resnet18 `
+  --output experiments\results\eval_summary.json
+```
+
+Evaluation currently reports total accuracy and per-class support/correct counts. It fails clearly if the checkpoint, class mapping, or dataset split is missing.
 
 ## Inference
 
@@ -148,13 +203,16 @@ If no checkpoint exists, inference fails honestly with a clear error. It does no
 
 ## Placeholder Outputs
 
-Some files in `experiments/results/`, the notebooks, `src/eval.py`, `src/gradcam.py`, and `src/utils/visualization.py` are still scaffolding from the original academic project. Treat them as placeholders until the project is trained and evaluated against a real checkpoint.
+Some existing files in `experiments/results/` and the notebooks are still scaffolding from the original academic project. Treat them as placeholders until the project is trained and evaluated against a real checkpoint.
+
+`src/gradcam.py` and `src/utils/visualization.py` are intentionally non-generating placeholders. They do not create fake outputs.
 
 ## Limitations
 
 - Predictions are educational screening output, not definitive agricultural diagnosis.
 - Performance is not validated until real evaluation metrics are generated.
 - PlantVillage is lab-curated and may not generalize to field images.
+- Grad-CAM and metrics-backed visualization are still planned work.
 - Web UI, deployment, and portfolio polish are planned for later phases.
 
 ## Recommended Next Phase
