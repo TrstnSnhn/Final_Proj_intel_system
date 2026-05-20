@@ -1,0 +1,19 @@
+experiment_name: smoke_test
+purpose: "Tiny CPU-only pipeline smoke test, not a real model quality run."
+model:
+  architecture: simple_cnn
+  pretrained: false
+  num_classes: 2
+  epochs: 1
+data:
+  split_dir: data/smoke/splits
+  batch_size: 2
+  num_workers: 0
+  augmentation: false
+training:
+  optimizer: adam
+  lr_unfrozen: 0.001
+  scheduler_patience: 1
+  scheduler_factor: 0.1
+  early_stopping_patience: 2
+  seed: 42

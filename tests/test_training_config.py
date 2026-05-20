@@ -1,7 +1,9 @@
 import unittest
+from pathlib import Path
 
 from src.training_config import (
     ConfigError,
+    load_yaml_config,
     resolve_learning_rate,
     resolve_optimizer_spec,
     validate_training_config,
@@ -45,6 +47,18 @@ class TrainingConfigTests(unittest.TestCase):
 
         self.assertEqual(resolve_learning_rate(cfg, stage="frozen"), 0.001)
         self.assertEqual(resolve_learning_rate(cfg, stage="unfrozen"), 0.0001)
+
+    def test_smoke_config_is_cpu_safe_and_offline(self):
+        cfg = load_yaml_config(Path("experiments/configs/smoke_test.yaml"))
+
+        validate_training_config(cfg)
+
+        self.assertEqual(cfg["model"]["architecture"], "simple_cnn")
+        self.assertFalse(cfg["model"].get("pretrained", False))
+        self.assertEqual(cfg["model"]["num_classes"], 2)
+        self.assertEqual(cfg["model"]["epochs"], 1)
+        self.assertEqual(cfg["data"]["num_workers"], 0)
+        self.assertEqual(cfg["data"]["split_dir"], "data/smoke/splits")
 
 
 if __name__ == "__main__":

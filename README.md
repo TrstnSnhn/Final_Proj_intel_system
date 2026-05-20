@@ -184,6 +184,45 @@ python src\eval.py `
 
 Evaluation currently reports total accuracy and per-class support/correct counts. It fails clearly if the checkpoint, class mapping, or dataset split is missing.
 
+## Tiny Smoke Workflow
+
+The smoke workflow proves the technical pipeline without downloading PlantVillage or training a useful model. It generates a tiny two-class image dataset under `data/smoke/`, trains for one CPU-safe epoch, writes a checkpoint and class mapping, evaluates the checkpoint, and runs one inference command.
+
+Create and validate the smoke dataset:
+
+```powershell
+python src\create_smoke_dataset.py --output data\smoke\splits --overwrite
+python src\validate_dataset.py data\smoke\splits --layout split
+```
+
+Run the smoke training config:
+
+```powershell
+python src\train.py --config experiments\configs\smoke_test.yaml
+```
+
+Evaluate and infer:
+
+```powershell
+python eval.py `
+  --checkpoint experiments\checkpoints\smoke_test_best.pt `
+  --class-map experiments\checkpoints\smoke_test_classes.json `
+  --data-dir data\smoke\splits\test `
+  --architecture simple_cnn `
+  --batch-size 2 `
+  --num-workers 0 `
+  --output experiments\results\smoke_eval_summary.json
+
+python src\infer.py `
+  --checkpoint experiments\checkpoints\smoke_test_best.pt `
+  --class-map experiments\checkpoints\smoke_test_classes.json `
+  --image data\smoke\splits\test\Smoke___green_leaf\Smoke___green_leaf_00.png `
+  --architecture simple_cnn `
+  --top-k 2
+```
+
+This smoke workflow only proves that the dataset, training, checkpoint, evaluation, and inference plumbing works. It does not prove model quality.
+
 ## Inference
 
 Once a trained checkpoint exists, use:

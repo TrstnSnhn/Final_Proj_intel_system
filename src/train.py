@@ -158,6 +158,7 @@ def main():
         batch_size=cfg["data"].get("batch_size", 32),
         num_workers=cfg["data"].get("num_workers", 2),
         augmentation=cfg["data"].get("augmentation", True),
+        split_dir=cfg["data"].get("split_dir", "data/splits"),
     )
 
     model = build_model(cfg).to(device)

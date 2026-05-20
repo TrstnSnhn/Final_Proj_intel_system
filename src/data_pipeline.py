@@ -9,17 +9,37 @@ from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 
-from config import (
-    RAW_DIR,
-    TRAIN_DIR,
-    VAL_DIR,
-    TEST_DIR,
-    IMAGE_SIZE,
-    BATCH_SIZE,
-    NUM_WORKERS,
-    IMAGENET_MEAN,
-    IMAGENET_STD,
-)
+try:
+    from .config import (
+        RAW_DIR,
+        SPLIT_DIR,
+        TRAIN_DIR,
+        VAL_DIR,
+        TEST_DIR,
+        IMAGE_SIZE,
+        BATCH_SIZE,
+        NUM_WORKERS,
+        IMAGENET_MEAN,
+        IMAGENET_STD,
+    )
+except ImportError:  # pragma: no cover - supports running as python src/data_pipeline.py
+    from config import (
+        RAW_DIR,
+        SPLIT_DIR,
+        TRAIN_DIR,
+        VAL_DIR,
+        TEST_DIR,
+        IMAGE_SIZE,
+        BATCH_SIZE,
+        NUM_WORKERS,
+        IMAGENET_MEAN,
+        IMAGENET_STD,
+    )
+
+
+def get_split_dirs(split_dir: Path | str = SPLIT_DIR) -> tuple[Path, Path, Path]:
+    root = Path(split_dir)
+    return root / "train", root / "val", root / "test"
 
 
 def get_transforms(mode: str = "train", augmentation: bool = True):
@@ -67,10 +87,16 @@ def split_dataset(data_dir: Path = RAW_DIR, seed: int = 42) -> None:
                 shutil.copy2(src, out / src.name)
 
 
-def get_dataloaders(batch_size: int = BATCH_SIZE, num_workers: int = NUM_WORKERS, augmentation: bool = True):
-    train_ds = ImageFolder(TRAIN_DIR, transform=get_transforms("train", augmentation=augmentation))
-    val_ds = ImageFolder(VAL_DIR, transform=get_transforms("val"))
-    test_ds = ImageFolder(TEST_DIR, transform=get_transforms("test"))
+def get_dataloaders(
+    batch_size: int = BATCH_SIZE,
+    num_workers: int = NUM_WORKERS,
+    augmentation: bool = True,
+    split_dir: Path | str = SPLIT_DIR,
+):
+    train_dir, val_dir, test_dir = get_split_dirs(split_dir)
+    train_ds = ImageFolder(train_dir, transform=get_transforms("train", augmentation=augmentation))
+    val_ds = ImageFolder(val_dir, transform=get_transforms("val"))
+    test_ds = ImageFolder(test_dir, transform=get_transforms("test"))
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
