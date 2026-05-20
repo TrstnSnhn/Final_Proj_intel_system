@@ -4,7 +4,7 @@ PlantGuard AI is an Intelligent Systems finals project for plant disease screeni
 
 ## Current Status
 
-Phase 1 focuses on stabilizing the machine-learning foundation before adding a web UI or deployment setup.
+Current work focuses on stabilizing the machine-learning foundation before adding a web UI or deployment setup.
 
 What exists now:
 
@@ -108,15 +108,27 @@ ruff check .
 
 ## Dataset
 
-The intended dataset is PlantVillage. The download script uses KaggleHub and requires local Kaggle credentials configured outside the repository.
+The intended dataset is PlantVillage. The primary configured source is the Kaggle dataset `abdallahalidev/plantvillage-dataset`, accessed through KaggleHub. Kaggle credentials, if used, must be configured outside this repository. Do not commit `kaggle.json`, `.env`, API tokens, downloaded data, split data, checkpoints, or generated results.
 
-Dataset download is intentionally not part of the safe validation flow:
+Dataset download is intentionally not part of the safe validation flow. Preview the planned KaggleHub source and local target without network access or writes:
+
+```powershell
+python data\get_data.py --dry-run
+```
+
+If KaggleHub is configured and you intentionally want to download and normalize the dataset into PlantGuard's raw ImageFolder layout, run:
 
 ```powershell
 python data\get_data.py
 ```
 
-Only run that command when you intentionally want to download the dataset.
+If you manually download or extract PlantVillage first, normalize the extracted archive into the expected raw folder with:
+
+```powershell
+python data\get_data.py --source-dir C:\path\to\extracted\plantvillage --overwrite
+```
+
+The script looks for the Kaggle `plantvillage dataset/color/` folder when present, because PlantGuard trains on RGB leaf images. It writes the normalized class folders under `data/raw/plantvillage/`, which is ignored by git.
 
 Expected raw dataset layout:
 
@@ -127,6 +139,8 @@ data/raw/plantvillage/
   Tomato___Early_blight/
     image-2.jpg
 ```
+
+If placing files manually, copy the class folders themselves into `data/raw/plantvillage/`. Do not leave an extra wrapper folder such as `data/raw/plantvillage/plantvillage dataset/color/`, because training expects class names directly under the raw root.
 
 After splitting, training expects:
 
@@ -140,12 +154,18 @@ data/splits/
     <class-name>/
 ```
 
-Dataset folders are ignored by git. Keep `data/raw/`, `data/splits/`, and any large generated artifacts local.
+Dataset folders are ignored by git. Keep `data/raw/`, `data/splits/`, `data/smoke/`, and any large generated artifacts local.
 
 Validate the raw dataset folder without training:
 
 ```powershell
 python src\validate_dataset.py data\raw\plantvillage --layout raw
+```
+
+Create the train/validation/test split:
+
+```powershell
+python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42
 ```
 
 Validate split folders:
@@ -161,13 +181,15 @@ Training requires the dataset to exist under `data/raw/plantvillage/` and then b
 Example commands:
 
 ```powershell
-python src\data_pipeline.py --action split --seed 42
+python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42
 python src\train.py --config experiments\configs\resnet18_default.yaml
 ```
 
 Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are usually large and should not be committed by accident.
 
 The `baseline_sklearn.yaml` config is marked as not implemented. It documents a planned classical ML baseline, but `src/train.py` is a PyTorch trainer and does not run `sklearn_rf` yet.
+
+For real-data pipeline preparation without a full training run, `experiments/configs/plantvillage_smoke.yaml` is available. It is a one-epoch CPU-friendly SimpleCNN smoke config using `data/splits`. It is only for verifying that real PlantVillage splits can feed training and produce artifacts; it does not demonstrate model quality.
 
 ## Evaluation
 

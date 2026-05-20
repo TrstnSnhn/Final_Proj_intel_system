@@ -60,6 +60,18 @@ class TrainingConfigTests(unittest.TestCase):
         self.assertEqual(cfg["data"]["num_workers"], 0)
         self.assertEqual(cfg["data"]["split_dir"], "data/smoke/splits")
 
+    def test_plantvillage_smoke_config_uses_real_split_path_without_pretrained_download(self):
+        cfg = load_yaml_config(Path("experiments/configs/plantvillage_smoke.yaml"))
+
+        validate_training_config(cfg)
+
+        self.assertEqual(cfg["model"]["architecture"], "simple_cnn")
+        self.assertFalse(cfg["model"].get("pretrained", False))
+        self.assertEqual(cfg["model"]["num_classes"], 38)
+        self.assertEqual(cfg["model"]["epochs"], 1)
+        self.assertEqual(cfg["data"]["split_dir"], "data/splits")
+        self.assertEqual(cfg["data"]["num_workers"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

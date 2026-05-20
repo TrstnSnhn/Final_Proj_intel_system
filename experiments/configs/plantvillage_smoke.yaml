@@ -1,0 +1,19 @@
+experiment_name: plantvillage_smoke
+purpose: "One-epoch real PlantVillage pipeline smoke test, not a model quality run."
+model:
+  architecture: simple_cnn
+  pretrained: false
+  num_classes: 38
+  epochs: 1
+data:
+  split_dir: data/splits
+  batch_size: 8
+  num_workers: 0
+  augmentation: false
+training:
+  optimizer: adam
+  lr_unfrozen: 0.001
+  scheduler_patience: 1
+  scheduler_factor: 0.1
+  early_stopping_patience: 2
+  seed: 42

@@ -13,9 +13,6 @@ try:
     from .config import (
         RAW_DIR,
         SPLIT_DIR,
-        TRAIN_DIR,
-        VAL_DIR,
-        TEST_DIR,
         IMAGE_SIZE,
         BATCH_SIZE,
         NUM_WORKERS,
@@ -26,9 +23,6 @@ except ImportError:  # pragma: no cover - supports running as python src/data_pi
     from config import (
         RAW_DIR,
         SPLIT_DIR,
-        TRAIN_DIR,
-        VAL_DIR,
-        TEST_DIR,
         IMAGE_SIZE,
         BATCH_SIZE,
         NUM_WORKERS,
@@ -66,11 +60,12 @@ def get_transforms(mode: str = "train", augmentation: bool = True):
     )
 
 
-def split_dataset(data_dir: Path = RAW_DIR, seed: int = 42) -> None:
+def split_dataset(data_dir: Path = RAW_DIR, split_dir: Path | str = SPLIT_DIR, seed: int = 42) -> None:
     if not data_dir.exists():
         raise FileNotFoundError(f"Missing raw dataset directory: {data_dir}")
 
-    for split in (TRAIN_DIR, VAL_DIR, TEST_DIR):
+    train_dir, val_dir, test_dir = get_split_dirs(split_dir)
+    for split in (train_dir, val_dir, test_dir):
         if split.exists():
             shutil.rmtree(split)
         split.mkdir(parents=True, exist_ok=True)
@@ -80,8 +75,8 @@ def split_dataset(data_dir: Path = RAW_DIR, seed: int = 42) -> None:
         train_files, tmp_files = train_test_split(images, test_size=0.30, random_state=seed)
         val_files, test_files = train_test_split(tmp_files, test_size=0.50, random_state=seed)
 
-        for split_dir, file_list in [(TRAIN_DIR, train_files), (VAL_DIR, val_files), (TEST_DIR, test_files)]:
-            out = split_dir / class_dir.name
+        for output_dir, file_list in [(train_dir, train_files), (val_dir, val_files), (test_dir, test_files)]:
+            out = output_dir / class_dir.name
             out.mkdir(parents=True, exist_ok=True)
             for src in file_list:
                 shutil.copy2(src, out / src.name)
@@ -111,15 +106,19 @@ def _count_images(split_dir: Path) -> int:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--action", choices=["split", "summary"], default="summary")
+    parser.add_argument("--raw-dir", default=str(RAW_DIR), help="Raw class-folder dataset root.")
+    parser.add_argument("--split-dir", default=str(SPLIT_DIR), help="Output split root.")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
+    split_root = Path(args.split_dir)
     if args.action == "split":
-        split_dataset(seed=args.seed)
+        split_dataset(data_dir=Path(args.raw_dir), split_dir=split_root, seed=args.seed)
 
-    print(f"Train: {_count_images(TRAIN_DIR)}")
-    print(f"Val: {_count_images(VAL_DIR)}")
-    print(f"Test: {_count_images(TEST_DIR)}")
+    train_dir, val_dir, test_dir = get_split_dirs(split_root)
+    print(f"Train: {_count_images(train_dir)}")
+    print(f"Val: {_count_images(val_dir)}")
+    print(f"Test: {_count_images(test_dir)}")
 
 
 if __name__ == "__main__":
