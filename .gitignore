@@ -1,0 +1,58 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+kaggle.json
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data generated locally from Kaggle or preprocessing
+data/raw/
+data/splits/
+data/processed/
+data/interim/
+data/disease_descriptions.csv
+data/disease_treatments.json
+
+# Model artifacts and training outputs
+experiments/checkpoints/
+experiments/logs/*
+!experiments/logs/.gitkeep
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Generated reports and plots
+experiments/results/*
+!experiments/results/.gitkeep
+!experiments/results/README.md
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log

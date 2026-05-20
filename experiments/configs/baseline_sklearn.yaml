@@ -1,4 +1,6 @@
 experiment_name: baseline_sklearn
+status: not_implemented
+note: "Classical sklearn baseline is planned but not supported by src/train.py yet."
 model:
   architecture: sklearn_rf
   num_classes: 38

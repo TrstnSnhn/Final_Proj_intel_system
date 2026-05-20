@@ -8,6 +8,6 @@ seaborn==0.13.2
 Pillow==10.3.0
 PyYAML==6.0.1
 tqdm==4.66.4
-pytorch-grad-cam==1.5.0
+grad-cam==1.5.0
 kagglehub==0.3.3
 jupyter==1.0.0
