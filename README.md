@@ -178,11 +178,13 @@ python src\validate_dataset.py data\splits --layout split
 
 Training requires the dataset to exist under `data/raw/plantvillage/` and then be split into train/validation/test folders.
 
+See `experiments/configs/README.md` before choosing a config. The verified local configs are `plantvillage_smoke.yaml` and `plantvillage_baseline_simple_cnn.yaml`; older 38-class and ResNet configs are retained as legacy/future-work configs and are not verified against the current local 15-class dataset.
+
 Example commands:
 
 ```powershell
 python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42 --overwrite
-python src\train.py --config experiments\configs\resnet18_default.yaml
+python src\train.py --config experiments\configs\plantvillage_baseline_simple_cnn.yaml
 ```
 
 The split command copies supported image files only (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`) and skips harmless non-image files in class folders. Its printed split counts match the supported-image counts used by validation, training, and evaluation. If `data/splits/` was created before this behavior existed, rerun the split command with `--overwrite`.
@@ -204,9 +206,10 @@ This baseline uses `data/splits`, 15 classes, 2 epochs, batch size 16, and no pr
 Generated checkpoints, logs, and metrics are ignored by git:
 
 ```text
-experiments/checkpoints/
-experiments/logs/
-experiments/results/
+experiments/checkpoints/<experiment_name>_best.pt
+experiments/checkpoints/<experiment_name>_classes.json
+experiments/logs/<experiment_name>.csv
+experiments/results/<experiment_name>_eval_summary.json
 ```
 
 ## Evaluation
@@ -235,6 +238,14 @@ python eval.py `
   --batch-size 16 `
   --num-workers 0 `
   --output experiments\results\plantvillage_baseline_eval_summary.json
+```
+
+Summarize a generated training log and evaluation summary without loading the dataset or model:
+
+```powershell
+python src\summarize_experiment.py `
+  --eval-summary experiments\results\plantvillage_baseline_eval_summary.json `
+  --training-log experiments\logs\plantvillage_baseline_simple_cnn.csv
 ```
 
 ## Tiny Smoke Workflow
@@ -320,4 +331,4 @@ Some existing files in `experiments/results/` and the notebooks are still scaffo
 
 ## Recommended Next Phase
 
-Phase 2 should clean up dependencies and structure, add more tests, and prepare the project for a small web inference UI without over-engineering the original finals-project scope.
+Next work should either tune the current SimpleCNN baseline modestly or create an offline-safe ResNet plan, then prepare a small web inference UI that uses a locally recreated checkpoint or a documented artifact handoff.

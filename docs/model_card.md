@@ -10,6 +10,8 @@
 
 The older ResNet18 configs are still present for future experiments, but the current verified baseline uses SimpleCNN to avoid pretrained weight downloads and keep the workflow CPU-safe.
 
+See `experiments/configs/README.md` for the current distinction between verified 15-class configs and legacy/future-work 38-class configs.
+
 ## Intended Use
 PlantGuard is an educational screening tool for plant disease classification from leaf photos. It is intended for a portfolio-ready Intelligent Systems project, not production agricultural diagnosis.
 
@@ -41,3 +43,4 @@ Generated artifacts stay local and are ignored by git:
 - The local dataset variant has 15 classes, while older configs still target the full 38-class PlantVillage setup.
 - The current baseline is intentionally conservative and not tuned.
 - ResNet and Grad-CAM work remain future phases.
+- A future web demo should use a locally recreated checkpoint or an explicit artifact handoff; no checkpoint is committed in this repository.

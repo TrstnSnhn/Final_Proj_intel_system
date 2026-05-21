@@ -86,6 +86,31 @@ class TrainingConfigTests(unittest.TestCase):
         self.assertEqual(cfg["data"]["num_workers"], 0)
         self.assertTrue(cfg["data"]["augmentation"])
 
+    def test_legacy_38_class_configs_are_not_verified_local_baselines(self):
+        legacy_configs = [
+            Path("experiments/configs/ablation_lr.yaml"),
+            Path("experiments/configs/ablation_no_augment.yaml"),
+            Path("experiments/configs/ablation_optimizer.yaml"),
+            Path("experiments/configs/baseline_scratch.yaml"),
+            Path("experiments/configs/resnet18_default.yaml"),
+        ]
+
+        for path in legacy_configs:
+            with self.subTest(path=path):
+                cfg = load_yaml_config(path)
+
+                validate_training_config(cfg)
+                self.assertEqual(cfg["model"]["num_classes"], 38)
+                self.assertNotEqual(cfg["experiment_name"], "plantvillage_baseline_simple_cnn")
+
+    def test_config_readme_documents_verified_and_legacy_config_groups(self):
+        text = Path("experiments/configs/README.md").read_text(encoding="utf-8")
+
+        self.assertIn("plantvillage_smoke.yaml", text)
+        self.assertIn("plantvillage_baseline_simple_cnn.yaml", text)
+        self.assertIn("Legacy and Future-Work Configs", text)
+        self.assertIn("pretrained weight downloads", text)
+
 
 if __name__ == "__main__":
     unittest.main()
