@@ -67,7 +67,7 @@ class TrainingConfigTests(unittest.TestCase):
 
         self.assertEqual(cfg["model"]["architecture"], "simple_cnn")
         self.assertFalse(cfg["model"].get("pretrained", False))
-        self.assertEqual(cfg["model"]["num_classes"], 38)
+        self.assertEqual(cfg["model"]["num_classes"], 15)
         self.assertEqual(cfg["model"]["epochs"], 1)
         self.assertEqual(cfg["data"]["split_dir"], "data/splits")
         self.assertEqual(cfg["data"]["num_workers"], 0)
