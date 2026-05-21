@@ -353,7 +353,15 @@ python -m flask --app web.app run
 
 ### Screenshots
 
-Screenshots are not committed yet. Add local screenshots after browser validation in a later phase.
+These screenshots were captured from the local Flask demo. They document browser validation only; deployment is still pending.
+
+| Default state | Prediction result |
+| --- | --- |
+| ![PlantGuard web demo default state](docs/screenshots/web-demo-default.png) | ![PlantGuard web demo prediction result](docs/screenshots/web-demo-result.png) |
+
+| Error state | Mobile layout |
+| --- | --- |
+| ![PlantGuard web demo error state](docs/screenshots/web-demo-error.png) | ![PlantGuard web demo mobile layout](docs/screenshots/web-demo-mobile.png) |
 
 ## Placeholder Outputs
 
