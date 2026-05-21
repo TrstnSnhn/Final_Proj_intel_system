@@ -193,6 +193,22 @@ The `baseline_sklearn.yaml` config is marked as not implemented. It documents a 
 
 For real-data pipeline preparation without a full training run, `experiments/configs/plantvillage_smoke.yaml` is available. It is a one-epoch CPU-friendly SimpleCNN smoke config using `data/splits`. It is only for verifying that real PlantVillage splits can feed training and produce artifacts; it does not demonstrate model quality.
 
+For the local 15-class PlantVillage variant used in Phase 2F, use the conservative SimpleCNN baseline config:
+
+```powershell
+python src\train.py --config experiments\configs\plantvillage_baseline_simple_cnn.yaml
+```
+
+This baseline uses `data/splits`, 15 classes, 2 epochs, batch size 16, and no pretrained weights. The verified local dataset contains 20,638 supported images split into 14,440 train, 3,097 validation, and 3,101 test images. In the Phase 2F CPU baseline run, evaluation reported 2,525 correct out of 3,101 test images, or 81.43% accuracy. Treat this as a baseline workflow result only, not final model quality.
+
+Generated checkpoints, logs, and metrics are ignored by git:
+
+```text
+experiments/checkpoints/
+experiments/logs/
+experiments/results/
+```
+
 ## Evaluation
 
 Evaluate a trained checkpoint against a class-folder split:
@@ -207,6 +223,19 @@ python src\eval.py `
 ```
 
 Evaluation currently reports total accuracy and per-class support/correct counts. It fails clearly if the checkpoint, class mapping, or dataset split is missing.
+
+Evaluate the local SimpleCNN baseline with:
+
+```powershell
+python eval.py `
+  --checkpoint experiments\checkpoints\plantvillage_baseline_simple_cnn_best.pt `
+  --class-map experiments\checkpoints\plantvillage_baseline_simple_cnn_classes.json `
+  --data-dir data\splits\test `
+  --architecture simple_cnn `
+  --batch-size 16 `
+  --num-workers 0 `
+  --output experiments\results\plantvillage_baseline_eval_summary.json
+```
 
 ## Tiny Smoke Workflow
 
@@ -263,6 +292,17 @@ python src\infer.py `
 If `--class-map` is omitted, the script looks for a sibling `*_classes.json` file next to the checkpoint.
 
 If no checkpoint exists, inference fails honestly with a clear error. It does not fake predictions.
+
+For the local SimpleCNN baseline, use:
+
+```powershell
+python src\infer.py `
+  --checkpoint experiments\checkpoints\plantvillage_baseline_simple_cnn_best.pt `
+  --class-map experiments\checkpoints\plantvillage_baseline_simple_cnn_classes.json `
+  --image path\to\leaf.jpg `
+  --architecture simple_cnn `
+  --top-k 3
+```
 
 ## Placeholder Outputs
 

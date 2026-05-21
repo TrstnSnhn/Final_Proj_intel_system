@@ -72,6 +72,20 @@ class TrainingConfigTests(unittest.TestCase):
         self.assertEqual(cfg["data"]["split_dir"], "data/splits")
         self.assertEqual(cfg["data"]["num_workers"], 0)
 
+    def test_plantvillage_baseline_simple_cnn_config_is_15_class_offline_baseline(self):
+        cfg = load_yaml_config(Path("experiments/configs/plantvillage_baseline_simple_cnn.yaml"))
+
+        validate_training_config(cfg)
+
+        self.assertEqual(cfg["model"]["architecture"], "simple_cnn")
+        self.assertFalse(cfg["model"].get("pretrained", False))
+        self.assertEqual(cfg["model"]["num_classes"], 15)
+        self.assertEqual(cfg["model"]["epochs"], 2)
+        self.assertEqual(cfg["data"]["split_dir"], "data/splits")
+        self.assertEqual(cfg["data"]["batch_size"], 16)
+        self.assertEqual(cfg["data"]["num_workers"], 0)
+        self.assertTrue(cfg["data"]["augmentation"])
+
 
 if __name__ == "__main__":
     unittest.main()

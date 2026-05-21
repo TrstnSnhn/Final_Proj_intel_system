@@ -1,0 +1,20 @@
+experiment_name: plantvillage_baseline_simple_cnn
+purpose: "Conservative SimpleCNN baseline for the local 15-class PlantVillage dataset variant; not a final model."
+model:
+  architecture: simple_cnn
+  pretrained: false
+  num_classes: 15
+  epochs: 2
+data:
+  split_dir: data/splits
+  batch_size: 16
+  num_workers: 0
+  augmentation: true
+training:
+  optimizer: adam
+  lr_unfrozen: 0.001
+  weight_decay: 0.0001
+  scheduler_patience: 1
+  scheduler_factor: 0.1
+  early_stopping_patience: 2
+  seed: 42
