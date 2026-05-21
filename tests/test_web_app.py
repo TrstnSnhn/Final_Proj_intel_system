@@ -53,6 +53,21 @@ class WebAppTests(unittest.TestCase):
         self.assertIn(b".prediction-card", body)
         self.assertIn(b".upload-panel", body)
 
+    def test_healthz_returns_non_sensitive_status_without_model_artifacts(self):
+        client = self.make_app(
+            PLANTGUARD_CHECKPOINT_PATH="C:/private/model.pt",
+            PLANTGUARD_CLASS_MAP_PATH="C:/private/classes.json",
+        ).test_client()
+
+        response = client.get("/healthz")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"service": "plantguard", "status": "ok"})
+        body = response.get_data(as_text=True)
+        self.assertNotIn("C:/private", body)
+        self.assertNotIn("model.pt", body)
+        self.assertNotIn("classes.json", body)
+
     def test_predict_rejects_missing_file(self):
         client = self.make_app().test_client()
 

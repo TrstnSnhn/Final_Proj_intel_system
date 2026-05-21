@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from PIL import Image, UnidentifiedImageError
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
@@ -44,6 +44,10 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     @app.get("/")
     def index():
         return render_index()
+
+    @app.get("/healthz")
+    def healthz():
+        return jsonify({"service": "plantguard", "status": "ok"})
 
     @app.post("/predict")
     def predict():

@@ -12,3 +12,4 @@ grad-cam==1.5.0
 kagglehub==0.3.3
 jupyter==1.0.0
 Flask==3.0.3
+gunicorn==23.0.0

@@ -6,7 +6,7 @@ PlantGuard is not deployed yet. This document records the recommended deployment
 
 - App entrypoint: `web.app:app`
 - Local command: `python -m flask --app web.app run`
-- Current web routes: `GET /`, `POST /predict`, and Flask static assets
+- Current web routes: `GET /`, `GET /healthz`, `POST /predict`, and Flask static assets
 - Current model architecture for the demo: `simple_cnn`
 - Current local checkpoint: `experiments/checkpoints/plantvillage_baseline_simple_cnn_best.pt`
 - Current local class map: `experiments/checkpoints/plantvillage_baseline_simple_cnn_classes.json`
@@ -18,6 +18,8 @@ PlantGuard is not deployed yet. This document records the recommended deployment
   - Maximum upload size: 5 MB
   - Temporary upload file is deleted after prediction
   - No permanent upload storage
+- Production-style server command: `gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app`
+- Docker scaffolding: `Dockerfile` and `.dockerignore`
 
 The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved.
 
@@ -68,6 +70,8 @@ experiments/checkpoints/plantvillage_baseline_simple_cnn_classes.json
 
 The current local files are small enough to handle as explicit demo artifacts, but they still belong outside this repository by default.
 
+The Docker image does not include these artifacts. A future deployment must provide them by mounting files at the default paths, setting `PLANTGUARD_CHECKPOINT_PATH` and `PLANTGUARD_CLASS_MAP_PATH`, or adding an approved startup download step.
+
 Recommended Phase 3F strategy:
 
 1. Keep artifacts ignored locally in `experiments/checkpoints/`.
@@ -95,7 +99,7 @@ If startup download is added later, it should:
 
 The Flask development server is for local validation only.
 
-Recommended production server:
+Production-style server:
 
 ```bash
 gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app
@@ -111,13 +115,13 @@ Recommended Docker direction for Hugging Face Spaces:
 
 - Base image: Python 3.11 slim image.
 - Install `requirements.txt`.
-- Add `gunicorn` to runtime dependencies in the implementation phase.
+- Use Gunicorn from `requirements.txt`.
 - Copy the repo without datasets, checkpoints, logs, caches, or virtual environments.
 - Expose the platform port, likely `7860` for Hugging Face Spaces.
 - Start with Gunicorn.
 - Keep debug mode off.
 
-Do not add Docker, Gunicorn, or platform config until Phase 3F is approved.
+Do not deploy this image until the model artifact host and runtime path strategy are approved.
 
 ## Environment Variables Plan
 
@@ -142,29 +146,25 @@ Do not create `.env` files in this repository. Configure production variables th
 - Keep the missing-artifact error clear and user-facing.
 - Keep the baseline educational disclaimer visible.
 - Avoid diagnosis language and model-quality overclaiming.
-- Add a lightweight health route before deployment, for example `GET /healthz`.
+- Use `GET /healthz` for process health checks. It does not load the model or require checkpoint files.
 - Add deployment validation that does not require a real user upload.
 
-## Recommended Phase 3F Scope
+## Recommended Next Deployment Prep Scope
 
-Phase 3F should prepare the repo for deployment without deploying:
+The next deployment-prep phase should still avoid live deployment unless explicitly approved:
 
-1. Add `gunicorn` as a conservative runtime dependency.
-2. Add a lightweight `GET /healthz` route and test it.
-3. Add artifact documentation, either in this file or `docs/model_artifacts.md`.
-4. Add startup artifact validation if it can stay simple.
-5. Add a Dockerfile and `.dockerignore` for Hugging Face Spaces Docker.
-6. Document the exact production command.
-7. Re-run local tests and Flask route validation.
+1. Approve an external artifact host for the baseline checkpoint and class map.
+2. Decide whether deployed artifacts are mounted, copied into a private deployment environment, or downloaded at startup.
+3. Add startup artifact validation if the chosen host needs it.
+4. Run a local Docker build and container smoke test if Docker is available.
+5. Prepare Hugging Face Spaces metadata only after artifact handling is decided.
 
-Do not deploy, push, upload model artifacts, or commit checkpoints in Phase 3F unless explicitly approved.
+Do not deploy, push, upload model artifacts, or commit checkpoints unless explicitly approved.
 
 ## Remaining Deployment Blockers
 
-- No production WSGI server dependency is committed yet.
-- No Dockerfile or `.dockerignore` exists.
-- No health check route exists.
 - No external artifact host has been approved.
 - No public checkpoint/class-map handoff exists.
 - No deployment target has been created.
+- Docker build/container smoke validation has not been completed in this phase.
 - Pricing, resource limits, and storage behavior must be checked immediately before actual deployment.

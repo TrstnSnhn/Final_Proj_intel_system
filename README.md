@@ -323,6 +323,8 @@ The Flask web demo supports local upload-and-predict testing with a simple respo
 
 Deployment planning lives in `docs/deployment.md`. The current recommendation is to prepare a Hugging Face Spaces Docker deployment path, with a local-only screenshot demo as the fallback until model artifact hosting is approved.
 
+Deployment scaffolding exists for future Docker-based hosting, but no live deployment has been performed. The Docker image still needs the ignored checkpoint and class map to be provided at runtime.
+
 The web demo expects these local artifacts, which are ignored by git:
 
 ```text
@@ -344,6 +346,14 @@ Then open the local Flask URL shown in the terminal. Upload rules are intentiona
 - Temporary upload handling only, no database and no permanent repo storage
 
 The UI includes a client-side image preview before submission, an empty state, clear inline error states, and top-3 prediction cards with confidence bars. The app uses the existing `src.infer.predict_image` path with `simple_cnn`. If the checkpoint or class mapping is missing, it fails clearly and tells you to recreate the baseline checkpoint. The result is a baseline educational screening output, not a definitive diagnosis and not final model quality.
+
+For production-style serving in a future deployment, use Gunicorn instead of Flask's development server:
+
+```bash
+gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app
+```
+
+A lightweight health check is available at `GET /healthz`. It confirms the app process is alive without loading the model or exposing artifact paths.
 
 Optional model artifact path overrides:
 
