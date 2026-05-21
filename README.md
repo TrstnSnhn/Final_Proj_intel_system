@@ -4,7 +4,7 @@ PlantGuard AI is an Intelligent Systems finals project for plant disease screeni
 
 ## Current Status
 
-Current work focuses on stabilizing the machine-learning foundation before adding a web UI or deployment setup.
+Current work focuses on turning the validated machine-learning workflow and local Flask demo into a deployment-ready portfolio project.
 
 What exists now:
 
@@ -321,6 +321,8 @@ python src\infer.py `
 
 The Flask web demo supports local upload-and-predict testing with a simple responsive UI. Deployment is not done yet.
 
+Deployment planning lives in `docs/deployment.md`. The current recommendation is to prepare a Hugging Face Spaces Docker deployment path, with a local-only screenshot demo as the fallback until model artifact hosting is approved.
+
 The web demo expects these local artifacts, which are ignored by git:
 
 ```text
@@ -375,7 +377,7 @@ Some existing files in `experiments/results/` and the notebooks are still scaffo
 - Performance is not validated until real evaluation metrics are generated.
 - PlantVillage is lab-curated and may not generalize to field images.
 - Grad-CAM and metrics-backed visualization are still planned work.
-- Web UI, deployment, and portfolio polish are planned for later phases.
+- Deployment, model artifact hosting, and additional portfolio polish are planned for later phases.
 
 ## Recommended Next Phase
 
