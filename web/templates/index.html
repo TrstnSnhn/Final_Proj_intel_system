@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PlantGuard Web Demo</title>
+  </head>
+  <body>
+    <main>
+      <h1>PlantGuard</h1>
+      <p>
+        Baseline educational screening demo for plant leaf images. This is not a definitive diagnosis
+        and the current SimpleCNN result is not final model quality.
+      </p>
+
+      <form action="/predict" method="post" enctype="multipart/form-data">
+        <label for="image">Upload one leaf image</label>
+        <input
+          id="image"
+          name="image"
+          type="file"
+          accept=".jpg,.jpeg,.png,.bmp,.webp,image/jpeg,image/png,image/bmp,image/webp"
+        >
+        <p>Supported file types: {{ allowed_types }}. Maximum size: {{ max_upload_mb }} MB.</p>
+        <button type="submit">Predict</button>
+      </form>
+
+      {% if error %}
+        <section role="alert" aria-live="polite">
+          <h2>Prediction unavailable</h2>
+          <p>{{ error }}</p>
+        </section>
+      {% endif %}
+
+      {% if predictions %}
+        <section aria-live="polite">
+          <h2>Top predictions</h2>
+          <ol>
+            {% for prediction in predictions %}
+              <li>
+                <strong>{{ prediction.class_name }}</strong>
+                <span>{{ "%.2f"|format(prediction.confidence * 100) }}%</span>
+              </li>
+            {% endfor %}
+          </ol>
+        </section>
+      {% endif %}
+    </main>
+  </body>
+</html>

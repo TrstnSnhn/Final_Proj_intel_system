@@ -15,13 +15,14 @@ What exists now:
 - Experiment YAML configs.
 - Checkpoint and class mapping save/load support.
 - Real checkpoint-based evaluation CLI.
+- Minimal Flask web demo backend for local image upload and prediction.
 - Basic NLP and RL project scaffolding.
 - Grad-CAM and visualization placeholders that fail honestly until implemented.
 - A command-line inference entrypoint that works once a trained checkpoint and class mapping exist.
 
 What is not implemented yet:
 
-- No web UI.
+- No polished web UI.
 - No mobile app.
 - No desktop app.
 - No deployment configuration.
@@ -44,6 +45,7 @@ The ML dependencies are intentionally pinned conservatively for Phase 1. Do not 
 - matplotlib and seaborn
 - Pillow
 - PyYAML
+- Flask
 - KaggleHub
 - Jupyter notebooks
 
@@ -313,6 +315,40 @@ python src\infer.py `
   --image path\to\leaf.jpg `
   --architecture simple_cnn `
   --top-k 3
+```
+
+## Local Web Demo
+
+Phase 3B adds a minimal Flask backend for local upload-and-predict testing. UI polish and deployment are not done yet.
+
+The web demo expects these local artifacts, which are ignored by git:
+
+```text
+experiments/checkpoints/plantvillage_baseline_simple_cnn_best.pt
+experiments/checkpoints/plantvillage_baseline_simple_cnn_classes.json
+```
+
+Run the local web app:
+
+```powershell
+python -m flask --app web.app run
+```
+
+Then open the local Flask URL shown in the terminal. Upload rules are intentionally conservative:
+
+- Supported file types: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`
+- Maximum file size: 5 MB
+- One image per request
+- Temporary upload handling only, no database and no permanent repo storage
+
+The app uses the existing `src.infer.predict_image` path with `simple_cnn` and returns top-3 predictions. If the checkpoint or class mapping is missing, it fails clearly and tells you to recreate the baseline checkpoint. The result is a baseline educational screening output, not a definitive diagnosis and not final model quality.
+
+Optional model artifact path overrides:
+
+```powershell
+$env:PLANTGUARD_CHECKPOINT_PATH="C:\path\to\model.pt"
+$env:PLANTGUARD_CLASS_MAP_PATH="C:\path\to\classes.json"
+python -m flask --app web.app run
 ```
 
 ## Placeholder Outputs
