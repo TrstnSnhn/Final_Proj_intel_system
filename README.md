@@ -165,7 +165,7 @@ python src\validate_dataset.py data\raw\plantvillage --layout raw
 Create the train/validation/test split:
 
 ```powershell
-python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42
+python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42 --overwrite
 ```
 
 Validate split folders:
@@ -181,9 +181,11 @@ Training requires the dataset to exist under `data/raw/plantvillage/` and then b
 Example commands:
 
 ```powershell
-python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42
+python src\data_pipeline.py --action split --raw-dir data\raw\plantvillage --split-dir data\splits --seed 42 --overwrite
 python src\train.py --config experiments\configs\resnet18_default.yaml
 ```
+
+The split command copies supported image files only (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`) and skips harmless non-image files in class folders. Its printed split counts match the supported-image counts used by validation, training, and evaluation. If `data/splits/` was created before this behavior existed, rerun the split command with `--overwrite`.
 
 Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are usually large and should not be committed by accident.
 

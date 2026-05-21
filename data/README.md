@@ -61,8 +61,10 @@ python src/validate_dataset.py data/raw/plantvillage --layout raw
 Create split folders:
 
 ```bash
-python src/data_pipeline.py --action split --raw-dir data/raw/plantvillage --split-dir data/splits --seed 42
+python src/data_pipeline.py --action split --raw-dir data/raw/plantvillage --split-dir data/splits --seed 42 --overwrite
 ```
+
+The split command copies supported image files only (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`) and skips non-image files in class folders. Split counts are supported-image counts, matching validation and training. If `data/splits/` was created before this behavior existed, rerun the split command with `--overwrite`.
 
 Validate split folders:
 
