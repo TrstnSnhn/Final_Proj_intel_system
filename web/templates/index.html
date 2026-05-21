@@ -4,47 +4,131 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PlantGuard Web Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
-    <main>
-      <h1>PlantGuard</h1>
-      <p>
-        Baseline educational screening demo for plant leaf images. This is not a definitive diagnosis
-        and the current SimpleCNN result is not final model quality.
-      </p>
+    <main class="app-shell">
+      <section class="hero-panel" aria-labelledby="app-title">
+        <p class="eyebrow">Intelligent Systems demo</p>
+        <h1 id="app-title">PlantGuard</h1>
+        <p class="hero-copy">
+          Upload a single leaf image and review the SimpleCNN baseline's top predictions.
+          Baseline educational screening means this is not a diagnosis, and not final model quality.
+        </p>
+        <div class="status-strip" aria-label="Current demo status">
+          <span>15-class local PlantVillage baseline</span>
+          <span>Top 3 predictions</span>
+          <span>No image storage</span>
+        </div>
+      </section>
 
-      <form action="/predict" method="post" enctype="multipart/form-data">
-        <label for="image">Upload one leaf image</label>
-        <input
-          id="image"
-          name="image"
-          type="file"
-          accept=".jpg,.jpeg,.png,.bmp,.webp,image/jpeg,image/png,image/bmp,image/webp"
-        >
-        <p>Supported file types: {{ allowed_types }}. Maximum size: {{ max_upload_mb }} MB.</p>
-        <button type="submit">Predict</button>
-      </form>
+      <section class="workspace-grid" aria-label="PlantGuard web demo">
+        <section class="upload-panel" aria-labelledby="upload-title">
+          <div class="section-heading">
+            <p class="section-kicker">Input</p>
+            <h2 id="upload-title">Leaf image</h2>
+          </div>
 
-      {% if error %}
-        <section role="alert" aria-live="polite">
-          <h2>Prediction unavailable</h2>
-          <p>{{ error }}</p>
+          <form action="/predict" method="post" enctype="multipart/form-data" class="upload-form">
+            <label for="image">Choose one plant leaf image</label>
+            <div class="dropzone">
+              <input
+                id="image"
+                name="image"
+                type="file"
+                accept=".jpg,.jpeg,.png,.bmp,.webp,image/jpeg,image/png,image/bmp,image/webp"
+                aria-describedby="upload-rules"
+              >
+              <div>
+                <strong>Browse or drop a leaf photo</strong>
+                <p id="upload-rules">Supported file types: {{ allowed_types }}. Maximum size: {{ max_upload_mb }} MB.</p>
+              </div>
+            </div>
+
+            <figure class="preview-card" id="leaf-preview" hidden>
+              <img id="leaf-preview-image" alt="Selected leaf image preview">
+              <figcaption id="leaf-preview-name">Selected image preview</figcaption>
+            </figure>
+
+            <button type="submit">Analyze image</button>
+          </form>
         </section>
-      {% endif %}
 
-      {% if predictions %}
-        <section aria-live="polite">
-          <h2>Top predictions</h2>
-          <ol>
-            {% for prediction in predictions %}
-              <li>
-                <strong>{{ prediction.class_name }}</strong>
-                <span>{{ "%.2f"|format(prediction.confidence * 100) }}%</span>
-              </li>
-            {% endfor %}
-          </ol>
+        <section class="results-panel" aria-live="polite" aria-labelledby="results-title">
+          <div class="section-heading">
+            <p class="section-kicker">Output</p>
+            <h2 id="results-title">Prediction result</h2>
+          </div>
+
+          {% if error %}
+            <div class="state-box error-box" role="alert">
+              <p class="state-label">Prediction unavailable</p>
+              <p>{{ error }}</p>
+            </div>
+          {% elif predictions %}
+            <div class="prediction-list">
+              {% for prediction in predictions %}
+                <article class="prediction-card">
+                  <div class="prediction-rank">Rank {{ prediction.rank }}</div>
+                  <div class="prediction-main">
+                    <h3>{{ prediction.class_name.replace("_", " ") }}</h3>
+                    <code>{{ prediction.class_name }}</code>
+                  </div>
+                  <div class="confidence-wrap">
+                    <span>{{ "%.2f"|format(prediction.confidence * 100) }}%</span>
+                    <div class="confidence-track" aria-hidden="true">
+                      <div
+                        class="confidence-bar"
+                        style="--confidence: {{ '%.2f'|format(prediction.confidence * 100) }}%;"
+                      ></div>
+                    </div>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="state-box empty-box">
+              <p class="state-label">Ready for a local baseline check</p>
+              <p>Choose a supported image, then run the baseline prediction. No upload is stored in the repository.</p>
+            </div>
+          {% endif %}
         </section>
-      {% endif %}
+      </section>
+
+      <section class="disclaimer-panel" aria-label="Baseline disclaimer">
+        <strong>Baseline disclaimer</strong>
+        <p>
+          PlantGuard is an educational Intelligent Systems project. Results are screening signals from a local
+          baseline checkpoint, not an agricultural diagnosis or production recommendation.
+        </p>
+      </section>
     </main>
+
+    <script>
+      const imageInput = document.getElementById("image");
+      const preview = document.getElementById("leaf-preview");
+      const previewImage = document.getElementById("leaf-preview-image");
+      const previewName = document.getElementById("leaf-preview-name");
+      let previewUrl = null;
+
+      imageInput?.addEventListener("change", () => {
+        const [file] = imageInput.files;
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = null;
+        }
+
+        if (!file) {
+          preview.hidden = true;
+          previewImage.removeAttribute("src");
+          return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        previewImage.src = previewUrl;
+        previewName.textContent = file.name;
+        preview.hidden = false;
+      });
+    </script>
   </body>
 </html>

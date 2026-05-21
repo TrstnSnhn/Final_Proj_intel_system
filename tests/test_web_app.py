@@ -36,7 +36,22 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"PlantGuard", response.data)
         self.assertIn(b"Baseline educational screening", response.data)
+        self.assertIn(b"not a diagnosis", response.data)
         self.assertIn(b"jpg, jpeg, png, bmp, webp", response.data)
+        self.assertIn(b"Maximum size: 5 MB", response.data)
+        self.assertIn(b"/static/styles.css", response.data)
+        self.assertIn(b"leaf-preview", response.data)
+
+    def test_stylesheet_route_returns_css(self):
+        client = self.make_app().test_client()
+
+        response = client.get("/static/styles.css")
+        body = response.get_data()
+        response.close()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b".prediction-card", body)
+        self.assertIn(b".upload-panel", body)
 
     def test_predict_rejects_missing_file(self):
         client = self.make_app().test_client()
@@ -57,6 +72,27 @@ class WebAppTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"Unsupported file type", response.data)
+
+    def test_predict_rejects_unreadable_image_with_valid_extension(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            checkpoint = root / "model.pt"
+            class_map = root / "classes.json"
+            checkpoint.write_bytes(b"placeholder")
+            class_map.write_text('{"classes": ["Tomato_healthy"]}', encoding="utf-8")
+            client = self.make_app(
+                PLANTGUARD_CHECKPOINT_PATH=str(checkpoint),
+                PLANTGUARD_CLASS_MAP_PATH=str(class_map),
+            ).test_client()
+
+            response = client.post(
+                "/predict",
+                data={"image": (io.BytesIO(b"not an image"), "leaf.jpg")},
+                content_type="multipart/form-data",
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn(b"could not be read as an image", response.data)
 
     def test_predict_rejects_oversized_upload(self):
         client = self.make_app(MAX_CONTENT_LENGTH=32).test_client()
@@ -119,6 +155,9 @@ class WebAppTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn(b"Tomato_healthy", response.data)
             self.assertIn(b"93.00%", response.data)
+            self.assertIn(b"prediction-card", response.data)
+            self.assertIn(b"confidence-bar", response.data)
+            self.assertIn(b"Rank 1", response.data)
             prediction.assert_called_once()
 
 

@@ -15,14 +15,14 @@ What exists now:
 - Experiment YAML configs.
 - Checkpoint and class mapping save/load support.
 - Real checkpoint-based evaluation CLI.
-- Minimal Flask web demo backend for local image upload and prediction.
+- Minimal Flask web demo for local image upload, preview, and prediction.
 - Basic NLP and RL project scaffolding.
 - Grad-CAM and visualization placeholders that fail honestly until implemented.
 - A command-line inference entrypoint that works once a trained checkpoint and class mapping exist.
 
 What is not implemented yet:
 
-- No polished web UI.
+- No deployed web UI.
 - No mobile app.
 - No desktop app.
 - No deployment configuration.
@@ -319,7 +319,7 @@ python src\infer.py `
 
 ## Local Web Demo
 
-Phase 3B adds a minimal Flask backend for local upload-and-predict testing. UI polish and deployment are not done yet.
+The Flask web demo supports local upload-and-predict testing with a simple responsive UI. Deployment is not done yet.
 
 The web demo expects these local artifacts, which are ignored by git:
 
@@ -341,7 +341,7 @@ Then open the local Flask URL shown in the terminal. Upload rules are intentiona
 - One image per request
 - Temporary upload handling only, no database and no permanent repo storage
 
-The app uses the existing `src.infer.predict_image` path with `simple_cnn` and returns top-3 predictions. If the checkpoint or class mapping is missing, it fails clearly and tells you to recreate the baseline checkpoint. The result is a baseline educational screening output, not a definitive diagnosis and not final model quality.
+The UI includes a client-side image preview before submission, an empty state, clear inline error states, and top-3 prediction cards with confidence bars. The app uses the existing `src.infer.predict_image` path with `simple_cnn`. If the checkpoint or class mapping is missing, it fails clearly and tells you to recreate the baseline checkpoint. The result is a baseline educational screening output, not a definitive diagnosis and not final model quality.
 
 Optional model artifact path overrides:
 
@@ -350,6 +350,10 @@ $env:PLANTGUARD_CHECKPOINT_PATH="C:\path\to\model.pt"
 $env:PLANTGUARD_CLASS_MAP_PATH="C:\path\to\classes.json"
 python -m flask --app web.app run
 ```
+
+### Screenshots
+
+Screenshots are not committed yet. Add local screenshots after browser validation in a later phase.
 
 ## Placeholder Outputs
 
