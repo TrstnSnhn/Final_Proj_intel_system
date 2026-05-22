@@ -167,5 +167,5 @@ Do not deploy, push, upload model artifacts, or commit checkpoints unless explic
 - No external artifact host has been approved.
 - No public checkpoint/class-map handoff exists, only local validation and documentation.
 - No deployment target has been created.
-- Docker build/container smoke validation has not been completed in this phase.
+- Docker build/container smoke validation has not been completed because Docker CLI is not available in the current environment.
 - Pricing, resource limits, and storage behavior must be checked immediately before actual deployment.

@@ -4,7 +4,7 @@ PlantGuard AI is an Intelligent Systems finals project for plant disease screeni
 
 ## Current Status
 
-Current work focuses on turning the validated machine-learning workflow and local Flask demo into a deployment-ready portfolio project.
+Current work focuses on turning the validated machine-learning workflow and local Flask demo into a deployment-ready portfolio project. PlantGuard is ready to present as a local portfolio demo, but it is not deployed yet.
 
 What exists now:
 
@@ -15,7 +15,7 @@ What exists now:
 - Experiment YAML configs.
 - Checkpoint and class mapping save/load support.
 - Real checkpoint-based evaluation CLI.
-- Minimal Flask web demo for local image upload, preview, and prediction.
+- Responsive Flask web demo for local image upload, preview, and prediction.
 - Basic NLP and RL project scaffolding.
 - Grad-CAM and visualization placeholders that fail honestly until implemented.
 - A command-line inference entrypoint that works once a trained checkpoint and class mapping exist.
@@ -46,8 +46,19 @@ The ML dependencies are intentionally pinned conservatively for Phase 1. Do not 
 - Pillow
 - PyYAML
 - Flask
+- Gunicorn
+- Docker scaffolding
 - KaggleHub
 - Jupyter notebooks
+
+## Features
+
+- Validate and split PlantVillage-style image datasets.
+- Train a conservative SimpleCNN baseline on the local 15-class PlantVillage variant.
+- Save and validate checkpoint/class-map artifacts without committing them.
+- Evaluate checkpoints and run command-line inference.
+- Run a local Flask web demo with image preview, upload validation, top-3 predictions, confidence bars, and clear error states.
+- Prepare for future Docker-based deployment without exposing secrets or model artifacts.
 
 ## Setup
 
@@ -107,6 +118,15 @@ If Ruff is installed:
 
 ```powershell
 ruff check .
+```
+
+For the current Windows `.venv` workflow, this is the final portfolio validation block:
+
+```powershell
+.\.venv\Scripts\python -m unittest discover -s tests
+.\.venv\Scripts\python -m ruff check .
+.\.venv\Scripts\python src\validate_artifacts.py --expected-classes 15
+.\.venv\Scripts\python -m flask --app web.app routes
 ```
 
 ## Dataset
@@ -391,10 +411,17 @@ Some existing files in `experiments/results/` and the notebooks are still scaffo
 ## Limitations
 
 - Predictions are educational screening output, not definitive agricultural diagnosis.
-- Performance is not validated until real evaluation metrics are generated.
+- The 81.43% SimpleCNN result is a baseline workflow result only, not final model quality.
 - PlantVillage is lab-curated and may not generalize to field images.
 - Grad-CAM and metrics-backed visualization are still planned work.
 - Deployment, model artifact hosting, and additional portfolio polish are planned for later phases.
+
+## GitHub Portfolio Notes
+
+- Suggested repository description: `Plant disease screening demo with PyTorch, Flask, and a local PlantVillage baseline.`
+- Suggested topics: `python`, `pytorch`, `flask`, `computer-vision`, `plant-disease`, `machine-learning`, `portfolio-project`.
+- Highlight the committed screenshots, local Flask demo, artifact validation workflow, and documented deployment plan.
+- Do not describe the baseline as production-ready or as a definitive diagnosis system.
 
 ## Recommended Next Phase
 

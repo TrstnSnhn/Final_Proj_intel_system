@@ -6,7 +6,7 @@
 - Dataset variant: local PlantVillage subset with 15 classes
 - Dataset split: 14,440 train, 3,097 validation, 3,101 test images
 - Config: `experiments/configs/plantvillage_baseline_simple_cnn.yaml`
-- Version: 0.2-baseline-readiness
+- Version: 0.3-portfolio-local-demo
 
 The older ResNet18 configs are still present for future experiments, but the current verified baseline uses SimpleCNN to avoid pretrained weight downloads and keep the workflow CPU-safe.
 
@@ -38,9 +38,13 @@ Generated artifacts stay local and are ignored by git:
 - `experiments/logs/plantvillage_baseline_simple_cnn.csv`
 - `experiments/results/plantvillage_baseline_eval_summary.json`
 
+## Local Demo Status
+
+The Flask web demo has been browser-validated locally with the SimpleCNN baseline artifacts. The demo is not deployed and should be presented as a local educational screening workflow.
+
 ## Caveats
 - PlantVillage is lab-curated and may not represent real field images.
 - The local dataset variant has 15 classes, while older configs still target the full 38-class PlantVillage setup.
 - The current baseline is intentionally conservative and not tuned.
 - ResNet and Grad-CAM work remain future phases.
-- A future web demo should use a locally recreated checkpoint or an explicit artifact handoff; no checkpoint is committed in this repository.
+- The local Flask web demo uses a locally recreated checkpoint or explicit artifact handoff; no checkpoint is committed in this repository.
