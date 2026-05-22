@@ -21,7 +21,7 @@ PlantGuard is not deployed yet. This document records the recommended deployment
 - Production-style server command: `gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app`
 - Docker scaffolding: `Dockerfile` and `.dockerignore`
 
-The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved.
+The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved. See `docs/artifacts.md` for artifact validation and handoff details.
 
 ## Deployment Options
 
@@ -72,14 +72,15 @@ The current local files are small enough to handle as explicit demo artifacts, b
 
 The Docker image does not include these artifacts. A future deployment must provide them by mounting files at the default paths, setting `PLANTGUARD_CHECKPOINT_PATH` and `PLANTGUARD_CLASS_MAP_PATH`, or adding an approved startup download step.
 
-Recommended Phase 3F strategy:
+Prepared artifact handoff strategy:
 
 1. Keep artifacts ignored locally in `experiments/checkpoints/`.
 2. Create a documented artifact handoff process.
 3. Prefer a separate Hugging Face model repository for the baseline checkpoint and class map if deploying to Hugging Face Spaces.
 4. Use GitHub Releases as the fallback artifact host if Hugging Face model hosting is not approved.
 5. Configure deployed artifact locations through environment variables or a small startup download script.
-6. Fail clearly if artifacts are missing. Do not fake predictions.
+6. Validate artifacts locally with `python src\validate_artifacts.py --expected-classes 15`.
+7. Fail clearly if artifacts are missing. Do not fake predictions.
 
 The Flask app already reads:
 
@@ -155,7 +156,7 @@ The next deployment-prep phase should still avoid live deployment unless explici
 
 1. Approve an external artifact host for the baseline checkpoint and class map.
 2. Decide whether deployed artifacts are mounted, copied into a private deployment environment, or downloaded at startup.
-3. Add startup artifact validation if the chosen host needs it.
+3. Add startup artifact download only after an artifact host is approved.
 4. Run a local Docker build and container smoke test if Docker is available.
 5. Prepare Hugging Face Spaces metadata only after artifact handling is decided.
 
@@ -164,7 +165,7 @@ Do not deploy, push, upload model artifacts, or commit checkpoints unless explic
 ## Remaining Deployment Blockers
 
 - No external artifact host has been approved.
-- No public checkpoint/class-map handoff exists.
+- No public checkpoint/class-map handoff exists, only local validation and documentation.
 - No deployment target has been created.
 - Docker build/container smoke validation has not been completed in this phase.
 - Pricing, resource limits, and storage behavior must be checked immediately before actual deployment.

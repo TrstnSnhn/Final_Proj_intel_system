@@ -25,7 +25,7 @@ What is not implemented yet:
 - No deployed web UI.
 - No mobile app.
 - No desktop app.
-- No deployment configuration.
+- No live deployment or approved model artifact host.
 - No committed trained checkpoint.
 - No real Grad-CAM output tied to a trained checkpoint.
 
@@ -99,6 +99,7 @@ python -m unittest discover -s tests
 python src\validate_dataset.py --help
 python src\infer.py --help
 python src\train.py --help
+python src\validate_artifacts.py --help
 python src\eval.py --help
 ```
 
@@ -191,7 +192,7 @@ python src\train.py --config experiments\configs\plantvillage_baseline_simple_cn
 
 The split command copies supported image files only (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`) and skips harmless non-image files in class folders. Its printed split counts match the supported-image counts used by validation, training, and evaluation. If `data/splits/` was created before this behavior existed, rerun the split command with `--overwrite`.
 
-Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are usually large and should not be committed by accident.
+Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are generated runtime files and should not be committed by accident. See `docs/artifacts.md` for the artifact handoff and validation workflow.
 
 The `baseline_sklearn.yaml` config is marked as not implemented. It documents a planned classical ML baseline, but `src/train.py` is a PyTorch trainer and does not run `sklearn_rf` yet.
 
@@ -325,7 +326,7 @@ Deployment planning lives in `docs/deployment.md`. The current recommendation is
 
 Deployment scaffolding exists for future Docker-based hosting, but no live deployment has been performed. The Docker image still needs the ignored checkpoint and class map to be provided at runtime.
 
-The web demo expects these local artifacts, which are ignored by git:
+The web demo expects these local artifacts, which are ignored by git. See `docs/artifacts.md` for artifact validation and future hosting options:
 
 ```text
 experiments/checkpoints/plantvillage_baseline_simple_cnn_best.pt
@@ -354,6 +355,12 @@ gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app
 ```
 
 A lightweight health check is available at `GET /healthz`. It confirms the app process is alive without loading the model or exposing artifact paths.
+
+Validate local artifacts before running or deploying the demo:
+
+```powershell
+python src\validate_artifacts.py --expected-classes 15
+```
 
 Optional model artifact path overrides:
 
@@ -391,4 +398,4 @@ Some existing files in `experiments/results/` and the notebooks are still scaffo
 
 ## Recommended Next Phase
 
-Next work should either tune the current SimpleCNN baseline modestly or create an offline-safe ResNet plan, then prepare a small web inference UI that uses a locally recreated checkpoint or a documented artifact handoff.
+Next deployment work should approve an artifact host and validate the Docker image/container flow without committing checkpoints or deploying until explicitly approved.
