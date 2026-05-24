@@ -20,6 +20,7 @@ PlantGuard is not deployed yet. This document records the recommended deployment
   - No permanent upload storage
 - Production-style server command: `gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app`
 - Docker scaffolding: `Dockerfile` and `.dockerignore`
+- Experimental Vercel entrypoint config: `pyproject.toml` points to `web.app:app`
 
 The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved. See `docs/artifacts.md` for artifact validation and handoff details.
 
@@ -58,6 +59,10 @@ Reasons:
 Fallback path: keep the local-only portfolio demo with screenshots until artifact hosting is approved. If a conventional web host is preferred later, Render is the simplest Flask fallback because its documented Flask path uses a familiar `pip install -r requirements.txt` plus Gunicorn start command.
 
 Do not deploy until the artifact hosting method and public checkpoint policy are approved.
+
+## Experimental Vercel Note
+
+`pyproject.toml` includes a `[tool.vercel]` entrypoint so Vercel can locate the Flask app as `web.app:app`. This is only an experimental compatibility fix. Hugging Face Spaces with Docker remains the preferred path for a full ML demo because PlantGuard depends on PyTorch and external model artifacts. A Vercel deployment may still fail later because serverless limits, package size, cold starts, or missing checkpoint/class-map artifacts need separate validation. Do not commit the checkpoint or class map for Vercel; artifact handoff still needs an approved strategy.
 
 ## Model Artifact Strategy
 
