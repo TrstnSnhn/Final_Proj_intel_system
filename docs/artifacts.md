@@ -112,7 +112,7 @@ Not recommended for the main GitHub repository: committing checkpoint/class-map 
 
 No artifact upload has been performed yet. Any upload to Hugging Face, GitHub Releases, object storage, or another host requires explicit approval.
 
-See `docs/huggingface_artifact_handoff.md` for the local packaging helper, Hugging Face model repository placeholder, and upload templates.
+See `docs/huggingface_artifact_handoff.md` for the local packaging helper, Hugging Face model repository ID `TrstnSnhn/plantguard-simplecnn-15class`, and upload templates.
 
 ## Docker Reminder
 

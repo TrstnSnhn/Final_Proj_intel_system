@@ -62,7 +62,7 @@ class PrepareArtifactHandoffTests(unittest.TestCase):
 
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(manifest["class_count"], 2)
-            self.assertEqual(manifest["recommended_repo_id"], "<your-hf-username>/plantguard-simplecnn-15class")
+            self.assertEqual(manifest["recommended_repo_id"], "TrstnSnhn/plantguard-simplecnn-15class")
             files = {item["role"]: item for item in manifest["files"]}
             self.assertEqual(files["checkpoint"]["filename"], "model.pt")
             self.assertEqual(files["class_map"]["filename"], "classes.json")

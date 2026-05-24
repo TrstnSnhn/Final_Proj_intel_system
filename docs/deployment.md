@@ -22,6 +22,8 @@ PlantGuard is not deployed yet. This document records the recommended deployment
 - Docker scaffolding: `Dockerfile` and `.dockerignore`
 - Experimental Vercel wrapper entrypoint: `app/app.py` re-exports `web.app:app`
 - Expected Hugging Face Spaces port: `7860`
+- Planned Hugging Face Space repo: `TrstnSnhn/PlantGuard`
+- Planned Hugging Face model artifact repo: `TrstnSnhn/plantguard-simplecnn-15class`
 - Health check URL after deployment: `/healthz`
 - JSON prediction endpoint for future frontend wrappers: `POST /api/predict`
 
@@ -94,9 +96,9 @@ Prepared artifact handoff strategy for Hugging Face Spaces:
 6. Validate artifacts locally with `python src\validate_artifacts.py --expected-classes 15`.
 7. Fail clearly if artifacts are missing. Do not fake predictions.
 
-The simplest first Hugging Face implementation is to upload the checkpoint and class map to a separate Hugging Face model repository, then add an approved startup download or mount step for the Space. Do not commit model artifacts to the main GitHub source repository.
+The simplest first Hugging Face implementation is to upload the checkpoint and class map to the separate Hugging Face model repository `TrstnSnhn/plantguard-simplecnn-15class`, then add an approved startup download or mount step for the Space `TrstnSnhn/PlantGuard`. Do not commit model artifacts to the main GitHub source repository.
 
-Artifact handoff preparation lives in `docs/huggingface_artifact_handoff.md`. That document uses the placeholder repo ID `<your-hf-username>/plantguard-simplecnn-15class` until the exact model repository name and visibility are approved. No upload has been performed.
+Artifact handoff preparation lives in `docs/huggingface_artifact_handoff.md`. No upload has been performed, and tokens or secrets must stay outside this repository.
 
 The Flask app already reads:
 

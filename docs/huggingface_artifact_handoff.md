@@ -6,11 +6,19 @@ No Hugging Face model repository has been created, and no artifact upload has be
 
 ## Recommended Model Repository
 
-Use this placeholder until the exact Hugging Face username, repository name, and visibility are approved:
+Use this confirmed model artifact repository ID:
 
 ```text
-<your-hf-username>/plantguard-simplecnn-15class
+TrstnSnhn/plantguard-simplecnn-15class
 ```
+
+The planned Hugging Face Space app host is:
+
+```text
+TrstnSnhn/PlantGuard
+```
+
+The Space repository is the app host. The model repository is the artifact host for the checkpoint and class map. The model repository has not been created by this phase unless you create it manually outside this repo, and no artifact upload has been performed.
 
 Suggested visibility:
 
@@ -33,10 +41,16 @@ The checkpoint and class map must come from the same training run. Do not upload
 The local helper validates the artifacts, copies them into an ignored `artifact_handoff/` folder, and writes a manifest with file names, sizes, SHA256 hashes, class count, and sample class names.
 
 ```powershell
-python src\prepare_artifact_handoff.py --expected-classes 15
+.\.venv\Scripts\python src\prepare_artifact_handoff.py --expected-classes 15
 ```
 
 The helper does not upload anything and does not require a Hugging Face account or token.
+
+Validate the source artifacts before preparing a handoff bundle:
+
+```powershell
+.\.venv\Scripts\python src\validate_artifacts.py --expected-classes 15
+```
 
 Expected local output:
 
@@ -77,12 +91,12 @@ Do not paste or commit tokens. Authentication must stay outside this repository.
 Do not run this until the repository ID and upload approval are confirmed. Verify the current Hugging Face CLI syntax before upload.
 
 ```powershell
-huggingface-cli upload <your-hf-username>/plantguard-simplecnn-15class `
+huggingface-cli upload TrstnSnhn/plantguard-simplecnn-15class `
   artifact_handoff\plantvillage_baseline_simple_cnn_best.pt `
   plantvillage_baseline_simple_cnn_best.pt `
   --repo-type model
 
-huggingface-cli upload <your-hf-username>/plantguard-simplecnn-15class `
+huggingface-cli upload TrstnSnhn/plantguard-simplecnn-15class `
   artifact_handoff\plantvillage_baseline_simple_cnn_classes.json `
   plantvillage_baseline_simple_cnn_classes.json `
   --repo-type model
@@ -95,13 +109,13 @@ from huggingface_hub import HfApi
 
 api = HfApi()
 api.upload_file(
-    repo_id="<your-hf-username>/plantguard-simplecnn-15class",
+    repo_id="TrstnSnhn/plantguard-simplecnn-15class",
     repo_type="model",
     path_or_fileobj="artifact_handoff/plantvillage_baseline_simple_cnn_best.pt",
     path_in_repo="plantvillage_baseline_simple_cnn_best.pt",
 )
 api.upload_file(
-    repo_id="<your-hf-username>/plantguard-simplecnn-15class",
+    repo_id="TrstnSnhn/plantguard-simplecnn-15class",
     repo_type="model",
     path_or_fileobj="artifact_handoff/plantvillage_baseline_simple_cnn_classes.json",
     path_in_repo="plantvillage_baseline_simple_cnn_classes.json",

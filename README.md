@@ -344,7 +344,7 @@ The Flask web demo supports local upload-and-predict testing with a simple respo
 
 Deployment planning lives in `docs/deployment.md`. The current recommendation is to prepare a Hugging Face Spaces Docker deployment path, with a local-only screenshot demo as the fallback until model artifact hosting is approved.
 
-Deployment scaffolding exists for future Docker-based hosting, but no live deployment has been performed. The Docker image still needs the ignored checkpoint and class map to be provided at runtime.
+Deployment scaffolding exists for future Docker-based hosting, but no live deployment has been performed. The planned Hugging Face Space app host is `TrstnSnhn/PlantGuard`, and the planned model artifact host is `TrstnSnhn/plantguard-simplecnn-15class`. The Docker image still needs the ignored checkpoint and class map to be provided at runtime.
 
 Vercel is not suitable for the full Flask plus PyTorch backend because the serverless bundle exceeded the platform limit during testing. It may be revisited later only as a lightweight frontend wrapper calling a Hugging Face backend API.
 

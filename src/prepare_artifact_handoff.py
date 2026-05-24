@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover - supports running as python src/prepare
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "artifact_handoff"
-DEFAULT_REPO_ID = "<your-hf-username>/plantguard-simplecnn-15class"
+DEFAULT_REPO_ID = "TrstnSnhn/plantguard-simplecnn-15class"
 MANIFEST_FILENAME = "manifest.json"
 
 
@@ -92,7 +92,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--repo-id",
         default=DEFAULT_REPO_ID,
-        help="Documentation-only target Hugging Face model repo ID placeholder.",
+        help="Documentation-only target Hugging Face model repo ID.",
     )
     return parser
 
