@@ -96,6 +96,8 @@ Prepared artifact handoff strategy for Hugging Face Spaces:
 
 The simplest first Hugging Face implementation is to upload the checkpoint and class map to a separate Hugging Face model repository, then add an approved startup download or mount step for the Space. Do not commit model artifacts to the main GitHub source repository.
 
+Artifact handoff preparation lives in `docs/huggingface_artifact_handoff.md`. That document uses the placeholder repo ID `<your-hf-username>/plantguard-simplecnn-15class` until the exact model repository name and visibility are approved. No upload has been performed.
+
 The Flask app already reads:
 
 ```text

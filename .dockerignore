@@ -32,6 +32,7 @@ data/disease_treatments.json
 
 experiments/checkpoints
 experiments/logs
+artifact_handoff
 experiments/results/*.json
 experiments/results/*.png
 experiments/results/*.jpg

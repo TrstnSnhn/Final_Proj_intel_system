@@ -42,6 +42,7 @@ data/disease_treatments.json
 experiments/checkpoints/
 experiments/logs/*
 !experiments/logs/.gitkeep
+artifact_handoff/
 *.pt
 *.pth
 *.ckpt

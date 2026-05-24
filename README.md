@@ -212,7 +212,7 @@ python src\train.py --config experiments\configs\plantvillage_baseline_simple_cn
 
 The split command copies supported image files only (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`) and skips harmless non-image files in class folders. Its printed split counts match the supported-image counts used by validation, training, and evaluation. If `data/splits/` was created before this behavior existed, rerun the split command with `--overwrite`.
 
-Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are generated runtime files and should not be committed by accident. See `docs/artifacts.md` for the artifact handoff and validation workflow.
+Trained checkpoints and class mappings are written to `experiments/checkpoints/`. That folder is ignored by git because model artifacts are generated runtime files and should not be committed by accident. See `docs/artifacts.md` for artifact validation and `docs/huggingface_artifact_handoff.md` for the planned Hugging Face model repository handoff workflow.
 
 The `baseline_sklearn.yaml` config is marked as not implemented. It documents a planned classical ML baseline, but `src/train.py` is a PyTorch trainer and does not run `sklearn_rf` yet.
 
@@ -345,6 +345,8 @@ The Flask web demo supports local upload-and-predict testing with a simple respo
 Deployment planning lives in `docs/deployment.md`. The current recommendation is to prepare a Hugging Face Spaces Docker deployment path, with a local-only screenshot demo as the fallback until model artifact hosting is approved.
 
 Deployment scaffolding exists for future Docker-based hosting, but no live deployment has been performed. The Docker image still needs the ignored checkpoint and class map to be provided at runtime.
+
+Vercel is not suitable for the full Flask plus PyTorch backend because the serverless bundle exceeded the platform limit during testing. It may be revisited later only as a lightweight frontend wrapper calling a Hugging Face backend API.
 
 The web demo expects these local artifacts, which are ignored by git. See `docs/artifacts.md` for artifact validation and future hosting options:
 
