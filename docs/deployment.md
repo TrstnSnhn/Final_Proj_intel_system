@@ -20,7 +20,7 @@ PlantGuard is not deployed yet. This document records the recommended deployment
   - No permanent upload storage
 - Production-style server command: `gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app`
 - Docker scaffolding: `Dockerfile` and `.dockerignore`
-- Experimental Vercel entrypoint config: `pyproject.toml` points to `web.app:app`
+- Experimental Vercel wrapper entrypoint: `app/app.py` re-exports `web.app:app`
 
 The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved. See `docs/artifacts.md` for artifact validation and handoff details.
 
@@ -62,7 +62,9 @@ Do not deploy until the artifact hosting method and public checkpoint policy are
 
 ## Experimental Vercel Note
 
-`pyproject.toml` includes a `[tool.vercel]` entrypoint so Vercel can locate the Flask app as `web.app:app`. This is only an experimental compatibility fix. Hugging Face Spaces with Docker remains the preferred path for a full ML demo because PlantGuard depends on PyTorch and external model artifacts. A Vercel deployment may still fail later because serverless limits, package size, cold starts, or missing checkpoint/class-map artifacts need separate validation. Do not commit the checkpoint or class map for Vercel; artifact handoff still needs an approved strategy.
+The earlier `pyproject.toml` Vercel entrypoint attempt was removed because Vercel's Python build can invoke `uv lock`, and a `pyproject.toml` without a `[project]` table is treated as an incomplete Python project. PlantGuard now uses `app/app.py` as a thin Vercel-compatible wrapper around the real Flask app at `web.app:app`.
+
+This remains an experimental compatibility path. Hugging Face Spaces with Docker remains the preferred path for a full ML demo because PlantGuard depends on PyTorch and external model artifacts. A Vercel deployment may still fail later because of serverless limits, package size, cold starts, static asset behavior, or missing checkpoint/class-map artifacts. Do not commit the checkpoint or class map for Vercel; artifact handoff still needs an approved strategy.
 
 ## Model Artifact Strategy
 

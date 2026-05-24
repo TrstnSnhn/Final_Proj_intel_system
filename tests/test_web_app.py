@@ -68,6 +68,13 @@ class WebAppTests(unittest.TestCase):
         self.assertNotIn("model.pt", body)
         self.assertNotIn("classes.json", body)
 
+    def test_vercel_wrapper_exports_flask_app(self):
+        from flask import Flask
+
+        from app.app import app
+
+        self.assertIsInstance(app, Flask)
+
     def test_predict_rejects_missing_file(self):
         client = self.make_app().test_client()
 
