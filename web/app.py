@@ -21,6 +21,7 @@ DISPLAY_ALLOWED_TYPES = "jpg, jpeg, png, bmp, webp"
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 ARCHITECTURE = "simple_cnn"
 TOP_K = 3
+API_DISCLAIMER = "Baseline educational screening result, not a definitive diagnosis."
 
 
 class WebPredictionError(ValueError):
@@ -39,6 +40,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     @app.errorhandler(RequestEntityTooLarge)
     def handle_upload_too_large(_error):
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Upload is too large. The maximum file size is 5 MB."}), 413
         return render_index("Upload is too large. The maximum file size is 5 MB."), 413
 
     @app.get("/")
@@ -61,6 +64,19 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         except WebPredictionError as exc:
             return render_index(str(exc)), 400
         return render_index(predictions=predictions), 200
+
+    @app.post("/api/predict")
+    def api_predict():
+        try:
+            uploaded = request.files.get("image")
+            predictions = run_web_prediction(
+                uploaded,
+                checkpoint_path=Path(app.config["PLANTGUARD_CHECKPOINT_PATH"]),
+                class_map_path=Path(app.config["PLANTGUARD_CLASS_MAP_PATH"]),
+            )
+        except WebPredictionError as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify({"disclaimer": API_DISCLAIMER, "predictions": predictions}), 200
 
     return app
 

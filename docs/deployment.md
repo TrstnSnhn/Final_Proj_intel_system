@@ -6,7 +6,7 @@ PlantGuard is not deployed yet. This document records the recommended deployment
 
 - App entrypoint: `web.app:app`
 - Local command: `python -m flask --app web.app run`
-- Current web routes: `GET /`, `GET /healthz`, `POST /predict`, and Flask static assets
+- Current web routes: `GET /`, `GET /healthz`, `POST /predict`, `POST /api/predict`, and Flask static assets
 - Current model architecture for the demo: `simple_cnn`
 - Current local checkpoint: `experiments/checkpoints/plantvillage_baseline_simple_cnn_best.pt`
 - Current local class map: `experiments/checkpoints/plantvillage_baseline_simple_cnn_classes.json`
@@ -21,6 +21,9 @@ PlantGuard is not deployed yet. This document records the recommended deployment
 - Production-style server command: `gunicorn --bind 0.0.0.0:${PORT:-7860} web.app:app`
 - Docker scaffolding: `Dockerfile` and `.dockerignore`
 - Experimental Vercel wrapper entrypoint: `app/app.py` re-exports `web.app:app`
+- Expected Hugging Face Spaces port: `7860`
+- Health check URL after deployment: `/healthz`
+- JSON prediction endpoint for future frontend wrappers: `POST /api/predict`
 
 The current checkpoint and class map are ignored by git. They must not be committed to this repository unless that decision is explicitly approved. See `docs/artifacts.md` for artifact validation and handoff details.
 
@@ -44,7 +47,7 @@ Official docs referenced while preparing this plan:
 - Railway Flask deploy guide: https://docs.railway.com/guides/flask
 - Fly.io app configuration: https://www.fly.io/docs/reference/configuration/
 
-## Recommendation
+## Deployment Decision
 
 Primary path: Hugging Face Spaces with Docker.
 
@@ -58,13 +61,15 @@ Reasons:
 
 Fallback path: keep the local-only portfolio demo with screenshots until artifact hosting is approved. If a conventional web host is preferred later, Render is the simplest Flask fallback because its documented Flask path uses a familiar `pip install -r requirements.txt` plus Gunicorn start command.
 
+Vercel is no longer considered suitable for the full Flask plus PyTorch backend. The Vercel Flask entrypoint was fixed with `app/app.py`, but the next build failed because the Python/PyTorch bundle was reported around 5065 MB, exceeding Vercel's 500 MB serverless function bundle/storage limit. Vercel can remain a future frontend-only wrapper or landing page that calls a deployed Hugging Face backend API.
+
 Do not deploy until the artifact hosting method and public checkpoint policy are approved.
 
 ## Experimental Vercel Note
 
 The earlier `pyproject.toml` Vercel entrypoint attempt was removed because Vercel's Python build can invoke `uv lock`, and a `pyproject.toml` without a `[project]` table is treated as an incomplete Python project. PlantGuard now uses `app/app.py` as a thin Vercel-compatible wrapper around the real Flask app at `web.app:app`.
 
-This remains an experimental compatibility path. Hugging Face Spaces with Docker remains the preferred path for a full ML demo because PlantGuard depends on PyTorch and external model artifacts. A Vercel deployment may still fail later because of serverless limits, package size, cold starts, static asset behavior, or missing checkpoint/class-map artifacts. Do not commit the checkpoint or class map for Vercel; artifact handoff still needs an approved strategy.
+This remains an experimental compatibility path only. Vercel should not host the full Python/PyTorch backend for PlantGuard. If Vercel is used later, use it as a lightweight frontend that calls the Hugging Face backend API, and configure CORS with an explicit allowlist rather than a broad open policy. Do not commit the checkpoint or class map for Vercel; artifact handoff still needs an approved strategy.
 
 ## Model Artifact Strategy
 
@@ -79,15 +84,17 @@ The current local files are small enough to handle as explicit demo artifacts, b
 
 The Docker image does not include these artifacts. A future deployment must provide them by mounting files at the default paths, setting `PLANTGUARD_CHECKPOINT_PATH` and `PLANTGUARD_CLASS_MAP_PATH`, or adding an approved startup download step.
 
-Prepared artifact handoff strategy:
+Prepared artifact handoff strategy for Hugging Face Spaces:
 
 1. Keep artifacts ignored locally in `experiments/checkpoints/`.
 2. Create a documented artifact handoff process.
-3. Prefer a separate Hugging Face model repository for the baseline checkpoint and class map if deploying to Hugging Face Spaces.
+3. Prefer a separate Hugging Face model repository for the baseline checkpoint and class map.
 4. Use GitHub Releases as the fallback artifact host if Hugging Face model hosting is not approved.
 5. Configure deployed artifact locations through environment variables or a small startup download script.
 6. Validate artifacts locally with `python src\validate_artifacts.py --expected-classes 15`.
 7. Fail clearly if artifacts are missing. Do not fake predictions.
+
+The simplest first Hugging Face implementation is to upload the checkpoint and class map to a separate Hugging Face model repository, then add an approved startup download or mount step for the Space. Do not commit model artifacts to the main GitHub source repository.
 
 The Flask app already reads:
 
@@ -125,7 +132,7 @@ Recommended Docker direction for Hugging Face Spaces:
 - Install `requirements.txt`.
 - Use Gunicorn from `requirements.txt`.
 - Copy the repo without datasets, checkpoints, logs, caches, or virtual environments.
-- Expose the platform port, likely `7860` for Hugging Face Spaces.
+- Expose port `7860`.
 - Start with Gunicorn.
 - Keep debug mode off.
 
@@ -156,6 +163,8 @@ Do not create `.env` files in this repository. Configure production variables th
 - Avoid diagnosis language and model-quality overclaiming.
 - Use `GET /healthz` for process health checks. It does not load the model or require checkpoint files.
 - Add deployment validation that does not require a real user upload.
+- Keep `POST /api/predict` same-origin by default.
+- If a future Vercel frontend calls the Hugging Face backend, add explicit CORS allowlisting for that frontend origin only.
 
 ## Recommended Next Deployment Prep Scope
 
@@ -166,6 +175,7 @@ The next deployment-prep phase should still avoid live deployment unless explici
 3. Add startup artifact download only after an artifact host is approved.
 4. Run a local Docker build and container smoke test if Docker is available.
 5. Prepare Hugging Face Spaces metadata only after artifact handling is decided.
+6. Validate `/healthz` and `POST /api/predict` inside the container before live deployment.
 
 Do not deploy, push, upload model artifacts, or commit checkpoints unless explicitly approved.
 
@@ -175,4 +185,5 @@ Do not deploy, push, upload model artifacts, or commit checkpoints unless explic
 - No public checkpoint/class-map handoff exists, only local validation and documentation.
 - No deployment target has been created.
 - Docker build/container smoke validation has not been completed because Docker CLI is not available in the current environment.
+- Hugging Face Spaces artifact download or mount behavior has not been implemented.
 - Pricing, resource limits, and storage behavior must be checked immediately before actual deployment.

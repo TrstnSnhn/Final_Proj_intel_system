@@ -182,6 +182,78 @@ class WebAppTests(unittest.TestCase):
             self.assertIn(b"Rank 1", response.data)
             prediction.assert_called_once()
 
+    def test_api_predict_rejects_missing_file_with_json_error(self):
+        client = self.make_app().test_client()
+
+        response = client.post("/api/predict", data={}, content_type="multipart/form-data")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content_type, "application/json")
+        self.assertIn("Please choose an image file", response.get_json()["error"])
+
+    def test_api_predict_rejects_invalid_extension_with_json_error(self):
+        client = self.make_app().test_client()
+
+        response = client.post(
+            "/api/predict",
+            data={"image": (io.BytesIO(b"not an image"), "leaf.txt")},
+            content_type="multipart/form-data",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content_type, "application/json")
+        self.assertIn("Unsupported file type", response.get_json()["error"])
+
+    def test_api_predict_reports_missing_artifacts_with_json_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            client = self.make_app(
+                PLANTGUARD_CHECKPOINT_PATH=str(root / "missing.pt"),
+                PLANTGUARD_CLASS_MAP_PATH=str(root / "missing_classes.json"),
+            ).test_client()
+
+            response = client.post(
+                "/api/predict",
+                data={"image": make_image_upload()},
+                content_type="multipart/form-data",
+            )
+
+            self.assertEqual(response.status_code, 400)
+            body = response.get_json()
+            self.assertIn("Model artifact is missing", body["error"])
+
+    def test_api_predict_returns_mocked_predictions_as_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            checkpoint = root / "model.pt"
+            class_map = root / "classes.json"
+            checkpoint.write_bytes(b"placeholder")
+            class_map.write_text('{"classes": ["Tomato_healthy"]}', encoding="utf-8")
+            client = self.make_app(
+                PLANTGUARD_CHECKPOINT_PATH=str(checkpoint),
+                PLANTGUARD_CLASS_MAP_PATH=str(class_map),
+            ).test_client()
+
+            with patch(
+                "web.app.predict_image",
+                return_value=[
+                    {"rank": 1, "class_name": "Tomato_healthy", "confidence": 0.93},
+                    {"rank": 2, "class_name": "Tomato_Late_blight", "confidence": 0.04},
+                    {"rank": 3, "class_name": "Tomato_Leaf_Mold", "confidence": 0.03},
+                ],
+            ):
+                response = client.post(
+                    "/api/predict",
+                    data={"image": make_image_upload()},
+                    content_type="multipart/form-data",
+                )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertEqual(body["predictions"][0]["class_name"], "Tomato_healthy")
+        self.assertEqual(body["predictions"][0]["confidence"], 0.93)
+        self.assertIn("not a definitive diagnosis", body["disclaimer"])
+
 
 if __name__ == "__main__":
     unittest.main()
